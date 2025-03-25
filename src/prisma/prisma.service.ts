@@ -9,16 +9,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
    async onModuleInit() {
       await this.$connect();
    }
-    $connect() {
-        throw new Error("Method not implemented.");
-    }
 
    async enableShutdownHooks(app: INestApplication) {
     this.$on('beforeExit' as Parameters<PrismaClient['$on']>[0], async () => {
         await app.close();
-     });
-   }
-    $on(arg0: unknown, arg1: () => Promise<void>) {
-        throw new Error("Method not implemented.");
-    }
+     });
+   }
 }
