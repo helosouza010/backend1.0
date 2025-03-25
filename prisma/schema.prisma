@@ -8,14 +8,20 @@ datasource db {
 }
 
 model curso {
-  id   Int    @id @default(autoincrement())
-  nome String @db.VarChar(255)
+  id              Int       @id @default(autoincrement())
+  nome            String    @db.VarChar(255)
+  cargahoraria    Int
+  datacriacao     DateTime? @db.DateTime(0)
+  dataatualizacao DateTime? @db.DateTime(0)
 }
 
 model universidade {
-  id    Int    @id @default(autoincrement())
-  nome  String @db.VarChar(255)
-  email String @db.VarChar(255)
+  id              Int       @id @default(autoincrement())
+  nome            String    @db.VarChar(255)
+  email           String    @db.VarChar(255)
+  cnpj            String?   @db.VarChar(20)
+  datacriacao     DateTime? @db.DateTime(0)
+  dataatualizacao DateTime? @db.DateTime(0)
 }
 
 model usuario {
