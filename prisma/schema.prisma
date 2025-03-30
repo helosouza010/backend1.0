@@ -10,7 +10,7 @@ datasource db {
 model aluno {
   id             Int      @id @default(autoincrement())
   nome           String   @db.VarChar(255)
-  email          String   @db.VarChar(255)
+  email          String   @unique @db.VarChar(255)
   senha          String   @db.VarChar(255)
   datacriacao    DateTime @default(now()) @db.Timestamp(0)
   datatualizacao DateTime @default(now()) @db.Timestamp(0)

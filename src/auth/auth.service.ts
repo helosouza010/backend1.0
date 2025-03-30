@@ -2,30 +2,32 @@ import { Injectable } from '@nestjs/common';  // Importa o decorator para tornar
 import { JwtService } from '@nestjs/jwt';  // Importa o serviço para manipulação de JWT
 import { AuthDto } from './dto/user.authenticacao.dto';  // Importa o DTO para autenticação
 import * as dotenv from 'dotenv';  // Importa o pacote dotenv para carregar variáveis de ambiente
+import { PrismaService } from 'src/prisma/prisma.service';  // Importe o PrismaService para interagir com o banco de dados
 
 // Carregar as variáveis de ambiente
 dotenv.config();  // Carrega o conteúdo do arquivo .env
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}  // Injeta o JwtService para geração e verificação de tokens
-
-  private users = [
-    { username: 'user', password: 'senha' },  // Lista de usuários fictícios para validação (em produção, isso viria do banco de dados)
-  ];
+  constructor(
+    private jwtService: JwtService,  // Injeta o JwtService para geração e verificação de tokens
+    private prisma: PrismaService,  // Injeta o PrismaService para interagir com o banco de dados
+  ) {}
 
   private refreshTokens: string[] = [];  // Armazena os refresh tokens gerados para validação posterior
 
   // Método de login
   async login(authDto: AuthDto) {
-    const { username, password } = authDto;  // Extrai as credenciais do DTO de autenticação
-    const user = this.users.find(u => u.username === username);  // Encontra o usuário com o nome de usuário fornecido
+    const { email, senha } = authDto;  // Extrai as credenciais do DTO de autenticação
+    
+    // Buscando o aluno no banco de dados
+    const aluno = await this.prisma.aluno.findUnique({ where: { email } });
 
-    if (!user || user.password !== password) {  // Valida as credenciais
+    if (!aluno || aluno.senha !== senha) {  // Valida as credenciais
       throw new Error('Credenciais inválidas');  // Lança erro se as credenciais forem inválidas
     }
 
-    const payload = { username, sub: 1 };  // Cria o payload do JWT (id do usuário fictício '1' aqui)
+    const payload = { email, sub: aluno.id };  // Cria o payload do JWT (id do aluno do banco de dados)
 
     // Gerar o access token (token de acesso)
     const accessToken = this.jwtService.sign(payload, {
@@ -63,7 +65,7 @@ export class AuthService {
 
       // Gera um novo access token baseado nos dados do refresh token
       const accessToken = this.jwtService.sign(
-        { username: payload.username, sub: payload.sub },  // Payload contendo o nome de usuário e ID
+        { email: payload.email, sub: payload.sub },  // Payload contendo o email e ID do aluno
         {
           secret: process.env.JWT_SECRET,  // Usando a chave secreta do access token
           expiresIn: '15m',  // O novo access token expira em 15 minutos

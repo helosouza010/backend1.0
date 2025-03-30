@@ -6,7 +6,7 @@ import { AlunoModule } from './aluno/aluno.module';
 import { CursoModule } from './curso/curso.module';
 import { UniversidadeModule } from './universidade/universidade.module';
 import { AuthModule } from './auth/auth.module';
-import { ProfileModule } from './profile/profile.module';
+
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { ProfileModule } from './profile/profile.module';
     CursoModule,
     UniversidadeModule,
     AuthModule,
-    ProfileModule,
+    
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,9 +1,0 @@
-    profile é so um exemplo q pode ser impementado em outras pastas
-como dentro desse projeto
-
-Curso
-Universidade
-Aluno
-
-    no caso o |Profile.Controller| gere as rotas e o |Profile.Service|  
-fornece os dados e executa operações pedidas pelo montroller
