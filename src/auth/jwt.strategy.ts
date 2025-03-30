@@ -1,35 +1,41 @@
-//    Define como o JWT será validado. Ele explica o processo 
-//de como verificar se o token é válido quando o usuário faz uma requisição autenticada.
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { PrismaService } from '../prisma/prisma.service';
+import { JwtPayload } from './auth-payload.interface';
+import * as dotenv from 'dotenv';
 
+dotenv.config();
 
-import { Injectable } from '@nestjs/common';  // Importa o decorator Injectable para permitir que a classe seja injetada como dependência
-import { PassportStrategy } from '@nestjs/passport';  // Importa o PassportStrategy, que é usado para integrar o Passport no NestJS
-import { ExtractJwt, Strategy } from 'passport-jwt';  // Importa os métodos do Passport para manipulação de JWT
-import { AuthService } from './auth.service';  // Importa o AuthService, utilizado no código para validação
-import { JwtPayload } from './auth-payload.interface';  // Importa a interface do payload do JWT
-import * as dotenv from 'dotenv';  // Importa a biblioteca dotenv para carregar as variáveis de ambiente
-
-dotenv.config();  // Carrega as variáveis de ambiente do arquivo .env
-
-@Injectable()  // Torna o JwtStrategy disponível para injeção de dependência no NestJS
+@Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private authService: AuthService) {
+  constructor(private prisma: PrismaService) {
     // Verifica se o segredo JWT_SECRET está presente nas variáveis de ambiente
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-      throw new Error('JWT_SECRET não está definido no arquivo .env');  // Lança erro caso o segredo não exista
+      throw new Error('JWT_SECRET não está definido no arquivo .env');
     }
 
-    // Chama o construtor da classe pai (PassportStrategy) passando as configurações para a estratégia JWT
+    // Configura a estratégia JWT para extrair o token do cabeçalho Authorization
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),  // Extraí o token JWT do cabeçalho Authorization
-      secretOrKey: secret,  // Usa o segredo carregado do arquivo .env para validar o JWT
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: secret,
     });
   }
 
   // Método validate é chamado quando o JWT é validado com sucesso
   async validate(payload: JwtPayload) {
-    // O payload contém informações do usuário que estavam no JWT. Geralmente, verifica-se se o usuário existe no banco de dados.
-    return { userId: payload.sub, username: payload.username };  // Retorna as informações extraídas do payload
+    // Busca o usuário no banco de dados pelo ID contido no token
+    const user = await this.prisma.aluno.findUnique({
+      where: { id: payload.sub },
+    });
+
+    // Se o usuário não for encontrado, lança um erro de "não autorizado"
+    if (!user) {
+      throw new UnauthorizedException('Usuário não encontrado ou token inválido');
+    }
+
+    // Retorna os dados reais do usuário autenticado
+    return { id: user.id, nome: user.nome, email: user.email };
   }
 }

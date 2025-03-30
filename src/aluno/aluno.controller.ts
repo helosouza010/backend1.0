@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AlunoService } from './aluno.service';
 import { CreateAlunoDto } from './dto/create-aluno.dto';
 import { UpdateAlunoDto } from './dto/update-aluno.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('aluno')
 export class AlunoController {
@@ -17,10 +18,16 @@ export class AlunoController {
     return this.alunoService.findAll();
   }
 
+  //@Get(':id')
+  //findOne(@Param('id') id: string) {
+  //  return this.alunoService.findOne(+id);
+  //}
   @Get(':id')
+  @UseGuards(JwtAuthGuard) // 🔒 Acessada com um token JWT válido
   findOne(@Param('id') id: string) {
     return this.alunoService.findOne(+id);
   }
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAlunoDto: UpdateAlunoDto) {
