@@ -1,15 +1,15 @@
-import { Injectable ,BadRequestException} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
-import {PrismaService} from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+
 @Injectable()
 export class UsuarioService {
   constructor(private prisma: PrismaService) {}
- 
-  async create(createUsuarioDto: CreateUsuarioDto) {
 
-    return await this.prisma.usuario.create({ 
-      data: createUsuarioDto 
+  async create(createUsuarioDto: CreateUsuarioDto) {
+    return await this.prisma.usuario.create({
+      data: createUsuarioDto,
     });
   }
 
@@ -18,24 +18,27 @@ export class UsuarioService {
   }
 
   async findOne(id: number) {
-    return this.prisma.usuario.findUnique ({
-      where: {id},
-  });
-}
+    return this.prisma.usuario.findUnique({
+      where: { id },
+    });
+  }
+
+  async findByNome(nome?: string) {
+    return this.prisma.usuario.findFirst({
+      where: { nome },
+    });
+  }
 
   async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
     return this.prisma.usuario.update({
-      where: {id},
+      where: { id },
       data: updateUsuarioDto,
     });
   }
 
   async remove(id: number) {
     return this.prisma.usuario.delete({
-      where: {id},
-  });
-}
-
-
-
+      where: { id },
+    });
+  }
 }

@@ -8,6 +8,7 @@ import {PrismaModule} from 'src/prisma/prisma.module';
   [PrismaModule],
   controllers: [UsuarioController],
   providers: [UsuarioService],
-  exports: [],
+  exports: [UsuarioService], // Exporta o serviço para que possa ser usado em outros módulos
+  // Isso é útil se você quiser usar o UsuarioService em outros módulos, como o AuthModule.
 })
 export class UsuarioModule {}
