@@ -1,0 +1,60 @@
+===========================================
+       🔧 ATALHOS ESSENCIAIS DO VS CODE
+===========================================
+
+🖥️  PLATAFORMAS:
+[Win] = Windows / Linux
+[Mac] = macOS
+
+-------------------------------------------
+🎯 GERAL
+-------------------------------------------
+• Paleta de Comandos ........... [Win] Ctrl+Shift+P | [Mac] Cmd+Shift+P
+• Abrir Terminal Integrado ..... [Win/Mac] Ctrl+'
+• Buscar Arquivo (Ctrl+P) ...... [Win] Ctrl+P | [Mac] Cmd+P
+• Alternar Arquivos Abertos .... [Win] Ctrl+Tab | [Mac] Cmd+Tab (no VS Code)
+• Salvar Tudo .................. [Win] Ctrl+K, S | [Mac] Cmd+Option+S
+• Comentar Linha ............... [Win] Ctrl+/ | [Mac] Cmd+/
+• Comentar Bloco ............... [Win] Shift+Alt+A | [Mac] Option+Shift+A
+• Duplicar Linha ............... [Win] Shift+Alt+↓ ou ↑ | [Mac] Option+Shift+↓ ou ↑
+• Deletar Linha ................ [Win] Ctrl+Shift+K | [Mac] Cmd+Shift+K
+
+-------------------------------------------
+🧠 MULTI-CURSORES / MULTI-LINHAS
+-------------------------------------------
+• Múltiplos Cursores (Clique) .. [Win] Alt+Clique | [Mac] Option+Clique
+• Cursores Acima/Abaixo ........ [Win] Alt+Shift+↑ / ↓ | [Mac] Option+Shift+↑ / ↓
+• Selecionar Próxima Ocorrência  [Win] Ctrl+D | [Mac] Cmd+D
+• Selecionar Todas Ocorrências . [Win] Ctrl+F2 | [Mac] Cmd+Ctrl+G
+
+-------------------------------------------
+📁 NAVEGAÇÃO
+-------------------------------------------
+• Ir para Definição ............ [Win/Mac] F12
+• Ir para Símbolo do Arquivo ... [Win] Ctrl+Shift+O | [Mac] Cmd+Shift+O
+• Ir para Linha Específica ..... [Win] Ctrl+G | [Mac] Cmd+G
+• Ir para Mudança Anterior ..... [Win] Ctrl+Shift+- | [Mac] Ctrl+-
+
+-------------------------------------------
+🛠️ EDIÇÃO AVANÇADA
+-------------------------------------------
+• Refatorar .................... [Win] Ctrl+. | [Mac] Cmd+.
+• Renomear Variável ............ [Win/Mac] F2
+• Formatar Documento ........... [Win] Shift+Alt+F | [Mac] Option+Shift+F
+• Mover Linha ↑/↓ .............. [Win] Alt+↑ / ↓ | [Mac] Option+↑ / ↓
+
+-------------------------------------------
+🐞 DEBUG
+-------------------------------------------
+• Iniciar Debug ................ [Win/Mac] F5
+• Step Over (Linha) ............ [Win/Mac] F10
+• Step Into (Dentro Função) .... [Win/Mac] F11
+• Step Out (Sair da Função) .... [Win/Mac] Shift+F11
+
+===========================================
+💡 DICA EXTRA:
+Você pode personalizar os atalhos em:
+[Win/Mac] File > Preferences > Keyboard Shortcuts
+Ou com: Ctrl+K, Ctrl+S
+===========================================
+

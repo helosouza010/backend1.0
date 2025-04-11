@@ -6,6 +6,8 @@ import { AlunoModule } from './aluno/aluno.module';
 import { CursoModule } from './curso/curso.module';
 import { UniversidadeModule } from './universidade/universidade.module';
 import { AuthModule } from './auth/auth.module';
+import { EnderecoModule } from './endereco/endereco.module';
+
 
 
 @Module({
@@ -15,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
     CursoModule,
     UniversidadeModule,
     AuthModule,
+    EnderecoModule,
     
   ],
   controllers: [AppController],

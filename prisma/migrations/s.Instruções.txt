@@ -1,0 +1,25 @@
+ Criado o setup-prisma.ts coloque os comandos dados pelo chat no Package.Json
+
+ reset caso de erros nos codigos do setup
+ 
+        npx prisma migrate reset --force
+
+✅ Conclusão (recomendada pra dev):
+Se quiser um fluxo seguro e controlado:
+
+Quando você mudar o schema, rode manualmente:
+
+
+        npx prisma migrate dev --name nome-da-migration
+
+
+Depois disso, npm run dev vai continuar cuidando do resto automaticamente:
+
+Criar o banco (se não existir)
+Aplicar todas as migrations
+Gerar o Prisma Client
+
+
+
+ctrl + shift + K      deleta linha
+shift + alt + ↓       duplica linha
