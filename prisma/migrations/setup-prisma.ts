@@ -1,4 +1,4 @@
-// src/setup-prisma.ts
+// prisma/migrations/setup-prisma.ts
 import { execSync } from 'child_process';
 
 function run(cmd: string) {

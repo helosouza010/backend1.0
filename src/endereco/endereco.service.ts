@@ -1,7 +1,12 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateEnderecoDto } from './dto/create-endereco.dto';
 import { UpdateEnderecoDto } from './dto/update-endereco.dto';
+import { TipoEndereco } from '@prisma/client';
 
 @Injectable()
 export class EnderecoService {
@@ -14,7 +19,9 @@ export class EnderecoService {
         data: createEnderecoDto,
       });
     } catch (error) {
-      throw new InternalServerErrorException('Erro ao criar endereço: ' + error.message);
+      throw new InternalServerErrorException(
+        'Erro ao criar endereço: ' + error.message,
+      );
     }
   }
 
@@ -34,7 +41,9 @@ export class EnderecoService {
         data: updateEnderecoDto,
       });
     } catch (error) {
-      throw new InternalServerErrorException('Erro ao atualizar endereço: ' + error.message);
+      throw new InternalServerErrorException(
+        'Erro ao atualizar endereço: ' + error.message,
+      );
     }
   }
 
@@ -43,8 +52,8 @@ export class EnderecoService {
     const endereco = await this.prisma.endereco.findUnique({
       where: { id },
       include: {
-        aluno: true, // Inclui os dados do aluno
-        universidade: true, // Inclui os dados da universidade
+        aluno: true,
+        universidade: true,
       },
     });
 
@@ -55,47 +64,53 @@ export class EnderecoService {
     return endereco;
   }
 
-  // Listar todos os endereços, incluindo dados de aluno e universidade
+  // Listar todos os endereços
   async findAll() {
     try {
       return await this.prisma.endereco.findMany({
         include: {
-          aluno: true, // Inclui os dados do aluno
-          universidade: true, // Inclui os dados da universidade
+          aluno: true,
+          universidade: true,
         },
       });
     } catch (error) {
-      throw new InternalServerErrorException('Erro ao buscar endereços: ' + error.message);
+      throw new InternalServerErrorException(
+        'Erro ao buscar endereços: ' + error.message,
+      );
     }
   }
 
-  // Listar todos os endereços comerciais, incluindo dados de aluno e universidade
+  // Listar todos os endereços comerciais
   async findAllComerciais() {
     try {
       return await this.prisma.endereco.findMany({
-        where: { tipo: 'COMERCIAL' }, // Filtra por tipo COMERCIAL
+        where: { tipo: TipoEndereco.COMERCIAL },
         include: {
-          aluno: true, // Inclui os dados do aluno
-          universidade: true, // Inclui os dados da universidade
+          aluno: true,
+          universidade: true,
         },
       });
     } catch (error) {
-      throw new InternalServerErrorException('Erro ao buscar endereços comerciais: ' + error.message);
+      throw new InternalServerErrorException(
+        'Erro ao buscar endereços comerciais: ' + error.message,
+      );
     }
   }
 
-  // Listar todos os endereços residenciais, incluindo dados de aluno e universidade
+  // Listar todos os endereços residenciais
   async findAllResidenciais() {
     try {
       return await this.prisma.endereco.findMany({
-        where: { tipo: 'RESIDENCIAL' }, // Filtra por tipo RESIDENCIAL
+        where: { tipo: TipoEndereco.RESIDENCIAL },
         include: {
-          aluno: true, // Inclui os dados do aluno
-          universidade: true, // Inclui os dados da universidade
+          aluno: true,
+          universidade: true,
         },
       });
     } catch (error) {
-      throw new InternalServerErrorException('Erro ao buscar endereços residenciais: ' + error.message);
+      throw new InternalServerErrorException(
+        'Erro ao buscar endereços residenciais: ' + error.message,
+      );
     }
   }
 
@@ -109,7 +124,9 @@ export class EnderecoService {
       });
       return { message: 'Endereço removido com sucesso' };
     } catch (error) {
-      throw new InternalServerErrorException('Erro ao remover endereço: ' + error.message);
+      throw new InternalServerErrorException(
+        'Erro ao remover endereço: ' + error.message,
+      );
     }
   }
 }

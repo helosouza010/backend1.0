@@ -55,10 +55,13 @@ model Endereco {
   cep             String         @db.VarChar(20)
   pais            String         @default("Brasil") @db.VarChar(100)
   tipo            TipoEndereco
+  
   universidadeId  Int?
   universidade    Universidade?  @relation("EnderecoUniversidade", fields: [universidadeId], references: [id])
+  
   alunoId         Int?           @unique
   aluno           Aluno?         @relation("EnderecoAluno", fields: [alunoId], references: [id])
+  
   dataCriacao     DateTime       @default(now()) @db.Timestamp(0)
   dataAtualizacao DateTime       @default(now()) @db.Timestamp(0)
 }
