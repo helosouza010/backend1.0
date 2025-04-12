@@ -1,0 +1,6 @@
+{
+  "nome": "João da Silva",
+  "email": "joao.silva@email.com",
+  "senha": "12345678",
+  "cursoId": 1
+}

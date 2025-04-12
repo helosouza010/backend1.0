@@ -1,0 +1,24 @@
+
+residencial
+{
+  "logradouro": "Rua A",
+  "numero": "123",
+  "bairro": "Centro",
+  "cidade": "São Paulo",
+  "estado": "SP",
+  "cep": "01000-000",
+  "tipo": "RESIDENCIAL",
+  "alunoId": 1
+}
+
+comercial
+{
+  "logradouro": "Av. Paulista",
+  "numero": "1000",
+  "bairro": "Bela Vista",
+  "cidade": "São Paulo",
+  "estado": "SP",
+  "cep": "01310-100",
+  "tipo": "COMERCIAL",
+  "universidadeId": 2
+}

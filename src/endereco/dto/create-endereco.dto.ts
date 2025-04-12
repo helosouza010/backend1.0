@@ -1,35 +1,56 @@
-import { IsString, IsOptional, IsNotEmpty, Length } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsEnum,
+  ValidateIf,
+} from 'class-validator';
+import { TipoEndereco } from '@prisma/client';
 
 export class CreateEnderecoDto {
-  @IsString()
+  @ValidateIf(o => !o.universidadeId && !o.alunoId)
+  @IsNotEmpty({ message: 'alunoId ou universidadeId deve ser informado' })
+  private validacaoRelacionamento!: any; // Apenas para forçar a validação
+
   @IsNotEmpty()
+  @IsString()
   logradouro: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   numero: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   complemento?: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   bairro: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   cidade: string;
 
+  @IsNotEmpty()
   @IsString()
-  @Length(2, 2)
   estado: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   cep: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   pais?: string;
+
+  @IsNotEmpty()
+  @IsEnum(TipoEndereco)
+  tipo: TipoEndereco;
+
+  @IsOptional()
+  universidadeId?: number;
+
+  @IsOptional()
+  alunoId?: number;
 }

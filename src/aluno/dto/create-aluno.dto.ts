@@ -1,5 +1,6 @@
-
-import { IsEmail, IsNotEmpty, Length } from 'class-validator';
+import { IsNotEmpty, IsEmail, Length, IsInt, IsOptional, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateEnderecoDto } from 'src/endereco/dto/create-endereco.dto'; // Criação do DTO para o endereço
 
 export class CreateAlunoDto {
   @IsNotEmpty()
@@ -14,5 +15,12 @@ export class CreateAlunoDto {
   @Length(6, 255)
   senha: string;
 
-  
+  @IsNotEmpty()
+  @IsInt()
+  cursoId: number;
+
+  @IsOptional() // O campo é opcional
+  @ValidateNested()
+  @Type(() => CreateEnderecoDto) // Assegura que o endereço será validado com o DTO específico
+  endereco?: CreateEnderecoDto; // Relacionamento com o endereço
 }

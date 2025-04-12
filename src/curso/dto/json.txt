@@ -1,0 +1,7 @@
+
+    inserindo dados po JSON
+
+{
+  "nome": "Engenharia de Software",
+  "universidadeId": 1
+}

@@ -1,4 +1,9 @@
-import { BadGatewayException, Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadGatewayException,
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateCursoDto } from './dto/create-curso.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateCursoDto } from './dto/update-curso.dto';
@@ -9,7 +14,9 @@ export class CursoService {
 
   async findAll() {
     try {
-      return await this.prisma.curso.findMany();
+      return await this.prisma.curso.findMany({
+        include: { universidade: true }, // opcional: traz os dados da universidade
+      });
     } catch (error) {
       throw new InternalServerErrorException('Erro ao buscar cursos: ' + error.message);
     }
@@ -18,6 +25,7 @@ export class CursoService {
   async findOne(id: number) {
     const curso = await this.prisma.curso.findUnique({
       where: { id },
+      include: { universidade: true }, // opcional
     });
 
     if (!curso) {
@@ -25,6 +33,27 @@ export class CursoService {
     }
 
     return curso;
+  }
+
+  async create(createCursoDto: CreateCursoDto) {
+    const cursoExists = await this.findByNome(createCursoDto.nome);
+
+    if (cursoExists) {
+      throw new BadGatewayException('Já existe um curso com este nome');
+    }
+
+    try {
+      return await this.prisma.curso.create({
+        data: {
+          nome: createCursoDto.nome,
+          universidade: {
+            connect: { id: createCursoDto.universidadeId },
+          },
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Erro ao criar curso: ' + error.message);
+    }
   }
 
   async update(id: number, updateCursoDto: UpdateCursoDto) {
@@ -59,24 +88,6 @@ export class CursoService {
       });
     } catch (error) {
       throw new InternalServerErrorException('Erro ao buscar curso por nome: ' + error.message);
-    }
-  }
-
-  async create(createCursoDto: CreateCursoDto) {
-    const cursoExists = await this.findByNome(createCursoDto.nome);
-
-    if (cursoExists) {
-      throw new BadGatewayException('Já existe um curso com este nome');
-    }
-
-    try {
-      return await this.prisma.curso.create({
-        data: {
-          nome: createCursoDto.nome,
-        },
-      });
-    } catch (error) {
-      throw new InternalServerErrorException('Erro ao criar curso: ' + error.message);
     }
   }
 }

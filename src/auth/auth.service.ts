@@ -1,80 +1,88 @@
-import { Injectable } from '@nestjs/common';  // Importa o decorator para tornar o serviço utilizável no NestJS
+import { Injectable, UnauthorizedException } from '@nestjs/common';  // Importa os decorators e exceções
 import { JwtService } from '@nestjs/jwt';  // Importa o serviço para manipulação de JWT
-import { AuthDto } from './dto/user.authenticacao.dto';  // Importa o DTO para autenticação
-import * as dotenv from 'dotenv';  // Importa o pacote dotenv para carregar variáveis de ambiente
-import { PrismaService } from 'src/prisma/prisma.service';  // Importe o PrismaService para interagir com o banco de dados
+import { AuthDto } from './dto/user.authenticacao.dto';  // Importa o DTO de autenticação
+import * as dotenv from 'dotenv';  // Carregar variáveis de ambiente
+import * as bcrypt from 'bcrypt';  // Importa bcrypt para comparar senhas hash
+import { PrismaService } from 'src/prisma/prisma.service';  // PrismaService para interação com o banco de dados
 
 // Carregar as variáveis de ambiente
-dotenv.config();  // Carrega o conteúdo do arquivo .env
+dotenv.config();
 
 @Injectable()
 export class AuthService {
   constructor(
-    private jwtService: JwtService,  // Injeta o JwtService para geração e verificação de tokens
-    private prisma: PrismaService,  // Injeta o PrismaService para interagir com o banco de dados
+    private jwtService: JwtService,  // Injeta o JwtService para gerar tokens
+    private prisma: PrismaService,  // Injeta o PrismaService para interação com o banco
   ) {}
 
-  private refreshTokens: string[] = [];  // Armazena os refresh tokens gerados para validação posterior
+  private refreshTokens: string[] = [];  // Armazena os refresh tokens válidos
 
   // Método de login
   async login(authDto: AuthDto) {
-    const { email, senha } = authDto;  // Extrai as credenciais do DTO de autenticação
-    
-    // Buscando o aluno no banco de dados
+    const { email, senha } = authDto;
+
+    // Busca o aluno no banco de dados
     const aluno = await this.prisma.aluno.findUnique({ where: { email } });
 
-    if (!aluno || aluno.senha !== senha) {  // Valida as credenciais
-      throw new Error('Credenciais inválidas');  // Lança erro se as credenciais forem inválidas
+    if (!aluno) {
+      throw new UnauthorizedException('Credenciais inválidas');  // Se o aluno não existir
     }
 
-    const payload = { email, sub: aluno.id };  // Cria o payload do JWT (id do aluno do banco de dados)
+    // Compara a senha fornecida com a senha hash armazenada
+    const senhaValida = await bcrypt.compare(senha, aluno.senhaHash);
+    if (!senhaValida) {
+      throw new UnauthorizedException('Credenciais inválidas');  // Se as senhas não coincidirem
+    }
 
-    // Gerar o access token (token de acesso)
+    const payload = { email, sub: aluno.id };  // Payload do JWT com o ID do aluno
+
+    // Gera o access token
     const accessToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET,  // Usando a chave secreta configurada nas variáveis de ambiente
-      expiresIn: '15m',  // O access token vai expirar em 15 minutos
+      secret: process.env.JWT_SECRET,
+      expiresIn: '15m',  // Expira em 15 minutos
     });
 
-    // Gerar o refresh token (token de renovação)
+    // Gera o refresh token
     const refreshToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_REFRESH_SECRET,  // Usando a chave secreta do refresh token
-      expiresIn: '7d',  // O refresh token vai expirar em 7 dias
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d',  // Expira em 7 dias
     });
 
-    // Armazenar o refresh token para posterior validação
+    // Armazena o refresh token para validação posterior
     this.refreshTokens.push(refreshToken);
 
-    // Retorna ambos os tokens para o usuário
     return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
+      access_token: accessToken,  // Retorna o access token gerado
+      refresh_token: refreshToken,  // Retorna o refresh token gerado
     };
   }
 
-  // Método para renovar o access token usando o refresh token
+  // Método para renovar o access token com o refresh token
   async refresh(refreshToken: string) {
-    if (!this.refreshTokens.includes(refreshToken)) {  // Verifica se o refresh token está na lista de tokens válidos
-      throw new Error('Refresh token inválido');  // Lança erro caso o refresh token não seja encontrado
+    // Verifica se o refresh token está na lista de tokens válidos
+    if (!this.refreshTokens.includes(refreshToken)) {
+      throw new UnauthorizedException('Refresh token inválido');  // Se o refresh token não for válido
     }
 
     try {
-      // Verifica e decodifica o refresh token para obter os dados do payload
+      // Decodifica e valida o refresh token
       const payload = this.jwtService.verify(refreshToken, {
-        secret: process.env.JWT_REFRESH_SECRET,  // Usando a chave secreta do refresh token
+        secret: process.env.JWT_REFRESH_SECRET,
       });
 
-      // Gera um novo access token baseado nos dados do refresh token
+      // Gera um novo access token
       const accessToken = this.jwtService.sign(
-        { email: payload.email, sub: payload.sub },  // Payload contendo o email e ID do aluno
+        { email: payload.email, sub: payload.sub },  // Usando o email e ID do aluno no payload
         {
-          secret: process.env.JWT_SECRET,  // Usando a chave secreta do access token
+          secret: process.env.JWT_SECRET,  // Chave secreta do JWT de acesso
           expiresIn: '15m',  // O novo access token expira em 15 minutos
         },
       );
 
       return { access_token: accessToken };  // Retorna o novo access token
     } catch (error) {
-      throw new Error('Refresh token expirado ou inválido');  // Lança erro caso o refresh token seja inválido ou expirado
+      // Se o refresh token for inválido ou expirado, lança uma exceção
+      throw new UnauthorizedException('Refresh token expirado ou inválido');
     }
   }
 }

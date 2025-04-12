@@ -1,14 +1,19 @@
-import { IsNotEmpty, Length } from 'class-validator';
-import { IsUniqueUniversidadeNome } from 'src/validation/v-universidade/nome-validation';
+import { IsNotEmpty, IsString, IsOptional, ValidateNested, IsArray } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateEnderecoDto } from 'src/endereco/dto/create-endereco.dto';
 
 export class CreateUniversidadeDto {
   @IsNotEmpty()
-  @Length(3, 255)
-  @IsUniqueUniversidadeNome({ message: 'Nome da universidade deve ser único' })
+  @IsString()
   nome: string;
 
   @IsNotEmpty()
-  @Length(6, 255)
-  Cnpj: string;
+  @IsString()
+  cnpj: string;
 
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateEnderecoDto)
+  enderecos?: CreateEnderecoDto[];
 }

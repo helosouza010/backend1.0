@@ -1,8 +1,7 @@
 // Define a estrutura de dados (interface) que será usada para armazenar 
-//as informações dentro do token JWT, como o ID do usuário.
-
+// as informações dentro do token JWT, como o ID do aluno e o email.
 
 export interface JwtPayload {
-  username: string;
-  sub: number; // ID do usuário
+  email: string;  // O email do aluno, utilizado para autenticação
+  sub: number;    // ID do aluno (campo 'id' no banco de dados)
 }
