@@ -7,6 +7,10 @@ function run(cmd: string) {
 }
 
 try {
+  // Limpa o terminal antes de tudo
+  const clearCommand = process.platform === 'win32' ? 'cls' : 'clear';
+  execSync(clearCommand, { stdio: 'inherit' });
+
   const isProd = process.env.NODE_ENV === 'production';
 
   if (isProd) {

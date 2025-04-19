@@ -1,7 +1,0 @@
-
-    inserindo dados po JSON
-
-{
-  "nome": "Universidade Federal do Cerrado",
-  "cnpj": "12.345.678/0001-90"
-}

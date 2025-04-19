@@ -12,20 +12,22 @@ import { UpdateCursoDto } from './dto/update-curso.dto';
 export class CursoService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // Buscar todos os cursos
   async findAll() {
     try {
       return await this.prisma.curso.findMany({
-        include: { universidade: true }, // opcional: traz os dados da universidade
+        include: { universidade: true }, // Inclui dados da universidade
       });
     } catch (error) {
       throw new InternalServerErrorException('Erro ao buscar cursos: ' + error.message);
     }
   }
 
+  // Buscar um curso por ID
   async findOne(id: number) {
     const curso = await this.prisma.curso.findUnique({
       where: { id },
-      include: { universidade: true }, // opcional
+      include: { universidade: true }, // Inclui dados da universidade
     });
 
     if (!curso) {
@@ -35,8 +37,11 @@ export class CursoService {
     return curso;
   }
 
+  // Criar um novo curso
   async create(createCursoDto: CreateCursoDto) {
-    const cursoExists = await this.findByNome(createCursoDto.nome);
+    const cursoExists = await this.prisma.curso.findFirst({
+      where: { nome: createCursoDto.nome }, // Usando findFirst para checar curso com nome duplicado
+    });
 
     if (cursoExists) {
       throw new BadGatewayException('Já existe um curso com este nome');
@@ -56,8 +61,9 @@ export class CursoService {
     }
   }
 
+  // Atualizar um curso existente
   async update(id: number, updateCursoDto: UpdateCursoDto) {
-    await this.findOne(id);
+    await this.findOne(id); // Garante que o curso existe
 
     try {
       return await this.prisma.curso.update({
@@ -69,25 +75,16 @@ export class CursoService {
     }
   }
 
+  // Remover um curso
   async remove(id: number) {
     try {
-      await this.findOne(id);
+      await this.findOne(id); // Garante que o curso existe
       await this.prisma.curso.delete({
         where: { id },
       });
       return { message: 'Curso removido com sucesso' };
     } catch (error) {
       throw new InternalServerErrorException('Erro ao remover curso: ' + error.message);
-    }
-  }
-
-  async findByNome(nome: string) {
-    try {
-      return await this.prisma.curso.findUnique({
-        where: { nome },
-      });
-    } catch (error) {
-      throw new InternalServerErrorException('Erro ao buscar curso por nome: ' + error.message);
     }
   }
 }

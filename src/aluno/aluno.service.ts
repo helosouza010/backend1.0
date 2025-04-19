@@ -13,11 +13,10 @@ import * as bcrypt from 'bcrypt';
 export class AlunoService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Criar um novo aluno com endereço
+  // Criar um novo aluno com endereço e vincular a uma turma (se fornecida)
   async create(createAlunoDto: CreateAlunoDto) {
-    const { nome, email, senha, cursoId, endereco } = createAlunoDto;
+    const { nome, email, senha, cursoId, endereco, turmaId } = createAlunoDto;
 
-    // Verifica se o e-mail já está cadastrado
     const emailExistente = await this.prisma.aluno.findUnique({
       where: { email },
     });
@@ -25,7 +24,6 @@ export class AlunoService {
       throw new BadRequestException('Já existe um aluno com este e-mail');
     }
 
-    // Verifica se o curso com o ID informado existe
     const curso = await this.prisma.curso.findUnique({
       where: { id: cursoId },
     });
@@ -33,33 +31,33 @@ export class AlunoService {
       throw new NotFoundException('Curso não encontrado');
     }
 
-    // Gera o hash da senha
     const senhaHash = await bcrypt.hash(senha, 10);
 
     try {
-      // Cria o aluno no banco de dados, incluindo o endereço se fornecido
-      return await this.prisma.aluno.create({
+      const aluno = await this.prisma.aluno.create({
         data: {
           nome,
           email,
           senhaHash,
           cursoId,
-          endereco: endereco
-            ? {
-                create: endereco, // Cria o endereço relacionado ao aluno
-              }
-            : undefined,
+          endereco: endereco ? { create: endereco } : undefined,
         },
         include: {
-          endereco: true, // Inclui o endereço na resposta
+          endereco: true,
         },
       });
+
+      if (turmaId) {
+        await this.vincularTurma(aluno.id, turmaId);
+      }
+
+      return aluno;
     } catch (error) {
       throw new InternalServerErrorException('Erro ao criar aluno: ' + error.message);
     }
   }
 
-  // Listar todos os alunos
+  // Listar todos os alunos com detalhes
   async findAll() {
     return this.prisma.aluno.findMany({
       include: {
@@ -68,22 +66,32 @@ export class AlunoService {
             universidade: true,
           },
         },
-        endereco: true, // Inclui o endereço do aluno
+        endereco: true,
+        turmas: {
+          include: {
+            turma: true,
+          },
+        },
       },
     });
   }
 
-  // Buscar um aluno pelo ID
+  // Buscar um aluno pelo ID, incluindo detalhes de curso, universidade, endereço e turmas
   async findOne(id: number) {
     const aluno = await this.prisma.aluno.findUnique({
-      where: { id },
+      where: { id }, // Passando corretamente o valor de id
       include: {
         curso: {
           include: {
             universidade: true,
           },
         },
-        endereco: true, // Inclui o endereço do aluno
+        endereco: true,
+        turmas: {
+          include: {
+            turma: true,
+          },
+        },
       },
     });
 
@@ -94,15 +102,28 @@ export class AlunoService {
     return aluno;
   }
 
-  // Atualizar um aluno com endereço
+  // Buscar as turmas de um aluno
+  async findAllTurmas() {
+    return this.prisma.aluno.findMany({
+      include: {
+        turmas: {
+          include: {
+            turma: true,  // Inclui as turmas relacionadas ao aluno
+          },
+        },
+      },
+    });
+  }
+
+  // Atualizar um aluno
   async update(id: number, updateAlunoDto: UpdateAlunoDto) {
-    const aluno = await this.findOne(id); // Garante que o aluno existe
+    await this.findOne(id);
 
     const { senha, endereco, ...rest } = updateAlunoDto;
 
     let senhaHash;
     if (senha) {
-      senhaHash = await bcrypt.hash(senha, 10); // Gera o novo hash de senha
+      senhaHash = await bcrypt.hash(senha, 10);
     }
 
     try {
@@ -111,14 +132,10 @@ export class AlunoService {
         data: {
           ...rest,
           senhaHash: senhaHash ? senhaHash : undefined,
-          endereco: endereco
-            ? {
-                update: endereco, // Atualiza o endereço se fornecido
-              }
-            : undefined,
+          endereco: endereco ? { update: endereco } : undefined,
         },
         include: {
-          endereco: true, // Inclui o endereço atualizado na resposta
+          endereco: true,
         },
       });
     } catch (error) {
@@ -128,7 +145,7 @@ export class AlunoService {
 
   // Remover um aluno
   async remove(id: number) {
-    const aluno = await this.findOne(id); // Garante que o aluno existe
+    await this.findOne(id);
 
     try {
       await this.prisma.aluno.delete({
@@ -137,6 +154,74 @@ export class AlunoService {
       return { message: 'Aluno removido com sucesso' };
     } catch (error) {
       throw new InternalServerErrorException('Erro ao remover aluno: ' + error.message);
+    }
+  }
+
+  // Vincular um aluno a uma turma
+  async vincularTurma(alunoId: number, turmaId: number) {
+    const aluno = await this.prisma.aluno.findUnique({ where: { id: alunoId } });
+    if (!aluno) {
+      throw new NotFoundException('Aluno não encontrado');
+    }
+
+    const turma = await this.prisma.turma.findUnique({ where: { id: turmaId } });
+    if (!turma) {
+      throw new NotFoundException('Turma não encontrada');
+    }
+
+    const vinculoExistente = await this.prisma.alunoTurma.findUnique({
+      where: {
+        alunoId_turmaId: {
+          alunoId,
+          turmaId,
+        },
+      },
+    });
+
+    if (vinculoExistente) {
+      throw new BadRequestException('Aluno já está vinculado a esta turma');
+    }
+
+    try {
+      await this.prisma.alunoTurma.create({
+        data: {
+          alunoId,
+          turmaId,
+        },
+      });
+      return { message: 'Aluno vinculado à turma com sucesso' };
+    } catch (error) {
+      throw new InternalServerErrorException('Erro ao vincular aluno à turma: ' + error.message);
+    }
+  }
+
+  // Desvincular um aluno de uma turma
+  async desvincularTurma(alunoId: number, turmaId: number) {
+    const vinculoExistente = await this.prisma.alunoTurma.findUnique({
+      where: {
+        alunoId_turmaId: {
+          alunoId,
+          turmaId,
+        },
+      },
+    });
+
+    if (!vinculoExistente) {
+      throw new NotFoundException('Vínculo entre aluno e turma não encontrado');
+    }
+
+    try {
+      await this.prisma.alunoTurma.delete({
+        where: {
+          alunoId_turmaId: {
+            alunoId,
+            turmaId,
+          },
+        },
+      });
+      return { message: 'Aluno desvinculado da turma com sucesso' };
+    } catch (error) {
+      throw new InternalServerErrorException('Erro ao desvincular aluno da turma: ' + error.message);
     }
   }
 }

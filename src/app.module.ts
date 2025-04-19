@@ -7,6 +7,9 @@ import { CursoModule } from './curso/curso.module';
 import { UniversidadeModule } from './universidade/universidade.module';
 import { AuthModule } from './auth/auth.module';
 import { EnderecoModule } from './endereco/endereco.module';
+import { DisciplinaModule } from './disciplina/disciplina.module';
+import { ProfessorModule } from './professor/professor.module';
+import { TurmaModule } from './turma/turma.module';
 
 
 
@@ -18,6 +21,9 @@ import { EnderecoModule } from './endereco/endereco.module';
     UniversidadeModule,
     AuthModule,
     EnderecoModule,
+    DisciplinaModule,
+    ProfessorModule,
+    TurmaModule,
     
   ],
   controllers: [AppController],

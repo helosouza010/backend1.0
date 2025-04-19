@@ -8,34 +8,54 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 export class AlunoController {
   constructor(private readonly alunoService: AlunoService) {}
 
+  // Criar um novo aluno
   @Post()
   create(@Body() createAlunoDto: CreateAlunoDto) {
     return this.alunoService.create(createAlunoDto);
   }
 
+  // Vincular um aluno a uma turma
+  @Post('aluno-turma')
+  async vincularAlunoTurma(@Body() body: { alunoId: number; turmaId: number }) {
+    return this.alunoService.vincularTurma(body.alunoId, body.turmaId);
+  }
+
+  // Listar todos os alunos
   @Get()
   findAll() {
     return this.alunoService.findAll();
   }
 
-  //@Get(':id')
-  //findOne(@Param('id') id: string) {
-  //  return this.alunoService.findOne(+id);
-  //}
+  @Get('aluno-turma')
+  async findAllTurmas() {
+    return this.alunoService.findAllTurmas();
+  }
+
+  // Buscar um aluno pelo ID
   @Get(':id')
-  @UseGuards(JwtAuthGuard) // 🔒 Acessada com um token JWT válido
+  //@UseGuards(JwtAuthGuard) // 🔒 Acessada com um token JWT válido
   findOne(@Param('id') id: string) {
     return this.alunoService.findOne(+id);
   }
 
-
+  // Atualizar um aluno
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAlunoDto: UpdateAlunoDto) {
     return this.alunoService.update(+id, updateAlunoDto);
   }
 
+  // Remover um aluno
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.alunoService.remove(+id);
+  }
+
+  // Buscar todos os alunos com suas turmas associadas
+  
+
+  // Desvincular aluno de uma turma
+  @Delete('aluno-turma/:alunoId/:turmaId')
+  async desvincularAlunoTurma(@Param('alunoId') alunoId: number, @Param('turmaId') turmaId: number) {
+    return this.alunoService.desvincularTurma(alunoId, turmaId);
   }
 }

@@ -1,0 +1,103 @@
+
+// 1. Universidade
+// Rota: POST http://localhost:3000/universidade
+{
+  "nome": "Universidade Federal do Cerrado",
+  "cnpj": "12.345.678/0001-90"
+}
+
+
+
+// 2. Curso
+// Rota: POST http://localhost:3000/curso
+{
+  "nome": "Engenharia de Software",
+  "universidadeId": 1
+}
+
+
+
+// 3. Endereco
+// Rota: POST http://localhost:3000/endereco
+
+residencial
+{
+  "logradouro": "Rua A",
+  "numero": "123",
+  "bairro": "Centro",
+  "cidade": "São Paulo",
+  "estado": "SP",
+  "cep": "01000-000",
+  "tipo": "RESIDENCIAL",
+  "alunoId": 1
+}
+
+comercial
+{
+  "logradouro": "Av. Paulista",
+  "numero": "1000",
+  "bairro": "Bela Vista",
+  "cidade": "São Paulo",
+  "estado": "SP",
+  "cep": "01310-100",
+  "tipo": "COMERCIAL",
+  "universidadeId": 2
+}
+
+
+
+// 4. Disciplina
+// Rota: POST http://localhost:3000/disciplina
+{
+  "nome": "Desenvolvimento Web",
+  "cursoId": 1
+}
+
+
+
+// 5. Professor
+// Rota: POST http://localhost:3000/professores
+{
+  "nome": "Maria Oliveira",
+  "email": "maria.oliveira@example.com"
+}
+
+
+
+// 6. Turma
+// Rota: POST http://localhost:3000/turmas
+{
+  "nome": "Turma A",
+  "cursoId": 1,
+  "professorId": 1,
+  "disciplinaId": 1
+}
+
+
+
+// 7. Aluno
+// Rota: POST http://localhost:3000/aluno
+{
+  "nome": "João da Silva",
+  "email": "joao.silva@email.com",
+  "senha": "12345678",
+  "cursoId": 1
+}
+
+
+
+// 8. AlunoTurma (Relacionamento)
+// Rota: POST http://localhost:3000/aluno-turma
+{
+  "alunoId": 1,
+  "turmaId": 1
+}
+
+
+
+// 9. ProfessorDisciplina (Relacionamento)
+// Rota: POST http://localhost:3000/professores/vincular-disciplina
+{
+  "professorId": 1,
+  "disciplinaId": 1
+}

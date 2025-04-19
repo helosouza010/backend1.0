@@ -22,5 +22,9 @@ export class CreateAlunoDto {
   @IsOptional() // O campo é opcional
   @ValidateNested()
   @Type(() => CreateEnderecoDto) // Assegura que o endereço será validado com o DTO específico
-  endereco?: CreateEnderecoDto; // Relacionamento com o endereço
+  endereco?: CreateEnderecoDto;
+  
+  @IsOptional()
+  @IsInt()
+  turmaId?: number; // Relacionamento com o endereço
 }
