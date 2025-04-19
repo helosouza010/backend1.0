@@ -10,6 +10,7 @@ import { EnderecoModule } from './endereco/endereco.module';
 import { DisciplinaModule } from './disciplina/disciplina.module';
 import { ProfessorModule } from './professor/professor.module';
 import { TurmaModule } from './turma/turma.module';
+import { DevModule } from './dev/dev.module';
 
 
 
@@ -24,6 +25,7 @@ import { TurmaModule } from './turma/turma.module';
     DisciplinaModule,
     ProfessorModule,
     TurmaModule,
+    DevModule,
     
   ],
   controllers: [AppController],

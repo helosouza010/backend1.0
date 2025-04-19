@@ -1,0 +1,74 @@
+
+{
+  "universidades": [
+    {
+      "nome": "Universidade Exemplo",
+      "cnpj": "12.345.678/0001-90",
+      "enderecos": [
+        {
+          "logradouro": "Rua Principal",
+          "numero": "123",
+          "bairro": "Centro",
+          "cidade": "Cidade",
+          "estado": "SP",
+          "cep": "00000-000",
+          "tipo": "COMERCIAL"
+        }
+      ]
+    }
+  ],
+  "cursos": [
+    {
+      "nome": "Engenharia de Software",
+      "universidadeId": 1
+    }
+  ],
+  "professores": [
+    {
+      "nome": "Maria Oliveira",
+      "email": "maria@example.com",
+      "disciplinas": [1],
+      "endereco": {
+        "logradouro": "Rua Professor",
+        "numero": "10",
+        "bairro": "Bairro",
+        "cidade": "Cidade",
+        "estado": "SP",
+        "cep": "00000-001",
+        "tipo": "RESIDENCIAL"
+      }
+    }
+  ],
+  "disciplinas": [
+    {
+      "nome": "Desenvolvimento Web",
+      "cursoId": 1
+    }
+  ],
+  "turmas": [
+    {
+      "nome": "Turma A",
+      "cursoId": 1,
+      "professorId": 1,
+      "disciplinaId": 1
+    }
+  ],
+  "alunos": [
+    {
+      "nome": "João Silva",
+      "email": "joao@example.com",
+      "senhaHash": "hash123",
+      "cursoId": 1,
+      "endereco": {
+        "logradouro": "Rua Estudante",
+        "numero": "50",
+        "bairro": "Bairro",
+        "cidade": "Cidade",
+        "estado": "SP",
+        "cep": "00000-002",
+        "tipo": "RESIDENCIAL"
+      },
+      "turmas": [1]
+    }
+  ]
+}
