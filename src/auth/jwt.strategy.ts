@@ -25,17 +25,28 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   // Método validate é chamado quando o JWT é validado com sucesso
   async validate(payload: JwtPayload) {
-    // Busca o usuário no banco de dados pelo ID contido no token
     const user = await this.prisma.aluno.findUnique({
       where: { id: payload.sub },
+      include: {
+        permissoes: {
+          include: {
+            permissao: true,
+          },
+        },
+      },
     });
 
-    // Se o usuário não for encontrado, lança um erro de "não autorizado"
     if (!user) {
       throw new UnauthorizedException('Usuário não encontrado ou token inválido');
     }
 
-    // Retorna os dados reais do usuário autenticado
-    return { id: user.id, nome: user.nome, email: user.email };
+    const permissoes = user.permissoes.map(p => p.permissao.nome);
+
+    return {
+      id: user.id,
+      nome: user.nome,
+      email: user.email,
+      permissoes,
+    };
   }
 }

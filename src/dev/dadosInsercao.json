@@ -1,74 +1,160 @@
-
 {
+  "permissoes": [
+    { "nome": "C_ALN" },
+    { "nome": "R_ALN" },
+    { "nome": "U_ALN" },
+    { "nome": "D_ALN" },
+
+    { "nome": "C_PRF" },
+    { "nome": "R_PRF" },
+    { "nome": "U_PRF" },
+    { "nome": "D_PRF" },
+
+    { "nome": "C_CRS" },
+    { "nome": "R_CRS" },
+    { "nome": "U_CRS" },
+    { "nome": "D_CRS" },
+
+    { "nome": "C_UNV" },
+    { "nome": "R_UNV" },
+    { "nome": "U_UNV" },
+    { "nome": "D_UNV" },
+
+    { "nome": "C_TUR" },
+    { "nome": "R_TUR" },
+    { "nome": "U_TUR" },
+    { "nome": "D_TUR" },
+
+    { "nome": "C_DIS" },
+    { "nome": "R_DIS" },
+    { "nome": "U_DIS" },
+    { "nome": "D_DIS" }
+  ],
   "universidades": [
     {
-      "nome": "Universidade Exemplo",
-      "cnpj": "12.345.678/0001-90",
+      "nome": "Universidade Alpha",
+      "cnpj": "11.111.111/0001-11",
       "enderecos": [
         {
-          "logradouro": "Rua Principal",
-          "numero": "123",
+          "logradouro": "Av. Alpha",
+          "numero": "1000",
           "bairro": "Centro",
-          "cidade": "Cidade",
+          "cidade": "AlphaCity",
           "estado": "SP",
-          "cep": "00000-000",
+          "cep": "01000-000",
+          "tipo": "COMERCIAL"
+        }
+      ]
+    },
+    {
+      "nome": "Universidade Beta",
+      "cnpj": "22.222.222/0001-22",
+      "enderecos": [
+        {
+          "logradouro": "Rua Beta",
+          "numero": "2000",
+          "bairro": "Zona Sul",
+          "cidade": "BetaVille",
+          "estado": "RJ",
+          "cep": "02000-000",
           "tipo": "COMERCIAL"
         }
       ]
     }
   ],
   "cursos": [
-    {
-      "nome": "Engenharia de Software",
-      "universidadeId": 1
-    }
+    { "nome": "Engenharia de Software", "universidadeId": 1 },
+    { "nome": "Ciência da Computação", "universidadeId": 1 },
+    { "nome": "Administração", "universidadeId": 2 }
+  ],
+  "disciplinas": [
+    { "nome": "Desenvolvimento Web", "cursoId": 1 },
+    { "nome": "Algoritmos", "cursoId": 2 },
+    { "nome": "Gestão Empresarial", "cursoId": 3 }
   ],
   "professores": [
     {
       "nome": "Maria Oliveira",
-      "email": "maria@example.com",
+      "email": "maria@email.com",
       "disciplinas": [1],
       "endereco": {
-        "logradouro": "Rua Professor",
-        "numero": "10",
-        "bairro": "Bairro",
-        "cidade": "Cidade",
+        "logradouro": "Rua dos Professores",
+        "numero": "101",
+        "bairro": "Leste",
+        "cidade": "AlphaCity",
         "estado": "SP",
-        "cep": "00000-001",
+        "cep": "01000-100",
+        "tipo": "RESIDENCIAL"
+      }
+    },
+    {
+      "nome": "Carlos Souza",
+      "email": "carlos@email.com",
+      "disciplinas": [2, 3],
+      "endereco": {
+        "logradouro": "Rua Ensino",
+        "numero": "202",
+        "bairro": "Norte",
+        "cidade": "BetaVille",
+        "estado": "RJ",
+        "cep": "02000-200",
         "tipo": "RESIDENCIAL"
       }
     }
   ],
-  "disciplinas": [
-    {
-      "nome": "Desenvolvimento Web",
-      "cursoId": 1
-    }
-  ],
   "turmas": [
-    {
-      "nome": "Turma A",
-      "cursoId": 1,
-      "professorId": 1,
-      "disciplinaId": 1
-    }
+    { "nome": "Turma A", "cursoId": 1, "professorId": 1, "disciplinaId": 1 },
+    { "nome": "Turma B", "cursoId": 2, "professorId": 2, "disciplinaId": 2 },
+    { "nome": "Turma C", "cursoId": 3, "professorId": 2, "disciplinaId": 3 }
   ],
   "alunos": [
     {
       "nome": "João Silva",
-      "email": "joao@example.com",
-      "senhaHash": "hash123",
+      "email": "joao@email.com",
+      "senha": "123456",
       "cursoId": 1,
       "endereco": {
-        "logradouro": "Rua Estudante",
-        "numero": "50",
-        "bairro": "Bairro",
-        "cidade": "Cidade",
+        "logradouro": "Rua Aluno 1",
+        "numero": "111",
+        "bairro": "Bairro 1",
+        "cidade": "AlphaCity",
         "estado": "SP",
-        "cep": "00000-002",
+        "cep": "01000-111",
         "tipo": "RESIDENCIAL"
       },
-      "turmas": [1]
+      "turmas": [1],
+      "permissoes": [
+        "C_ALN", "R_ALN", "U_ALN", "D_ALN",
+        "C_PRF", "R_PRF", "U_PRF", "D_PRF",
+        "C_CRS", "R_CRS", "U_CRS", "D_CRS",
+        "C_UNV", "R_UNV", "U_UNV", "D_UNV",
+        "C_TUR", "R_TUR", "U_TUR", "D_TUR",
+        "C_DIS", "R_DIS", "U_DIS", "D_DIS"
+      ]
+    },
+    {
+      "nome": "Ana Paula",
+      "email": "ana@email.com",
+      "senha": "123456",
+      "cursoId": 2,
+      "endereco": {
+        "logradouro": "Rua Aluno 2",
+        "numero": "222",
+        "bairro": "Bairro 2",
+        "cidade": "BetaVille",
+        "estado": "RJ",
+        "cep": "02000-222",
+        "tipo": "RESIDENCIAL"
+      },
+      "turmas": [2],
+      "permissoes": [
+        "C_ALN", "R_ALN", "U_ALN", "D_ALN",
+        "C_PRF", "R_PRF", "U_PRF", "D_PRF",
+        "C_CRS", "R_CRS", "U_CRS", "D_CRS",
+        "C_UNV", "R_UNV", "U_UNV", "D_UNV",
+        "C_TUR", "R_TUR", "U_TUR", "D_TUR",
+        "C_DIS", "R_DIS", "U_DIS", "D_DIS"
+      ]
     }
   ]
 }

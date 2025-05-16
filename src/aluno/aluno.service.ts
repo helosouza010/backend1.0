@@ -17,6 +17,7 @@ export class AlunoService {
   async create(createAlunoDto: CreateAlunoDto) {
     const { nome, email, senha, cursoId, endereco, turmaId } = createAlunoDto;
 
+    // Verifica se já existe aluno com o mesmo email
     const emailExistente = await this.prisma.aluno.findUnique({
       where: { email },
     });
@@ -24,6 +25,7 @@ export class AlunoService {
       throw new BadRequestException('Já existe um aluno com este e-mail');
     }
 
+    // Verifica se o curso existe
     const curso = await this.prisma.curso.findUnique({
       where: { id: cursoId },
     });
@@ -31,9 +33,11 @@ export class AlunoService {
       throw new NotFoundException('Curso não encontrado');
     }
 
+    // Faz o hash da senha antes de salvar no banco
     const senhaHash = await bcrypt.hash(senha, 10);
 
     try {
+      // Cria o aluno com senha criptografada e, se informado, cria o endereço
       const aluno = await this.prisma.aluno.create({
         data: {
           nome,
@@ -47,6 +51,7 @@ export class AlunoService {
         },
       });
 
+      // Se foi passada turmaId, vincula o aluno à turma
       if (turmaId) {
         await this.vincularTurma(aluno.id, turmaId);
       }
@@ -55,6 +60,31 @@ export class AlunoService {
     } catch (error) {
       throw new InternalServerErrorException('Erro ao criar aluno: ' + error.message);
     }
+  }
+
+  // Atualiza senhas que estão armazenadas em texto puro para hash bcrypt
+  async atualizarSenhasTextoPuro() {
+    // Busca todos os alunos no banco
+    const alunos = await this.prisma.aluno.findMany();
+
+    for (const aluno of alunos) {
+      // Verifica se a senha parece estar em texto puro
+      // Exemplo: hashes bcrypt normalmente começam com '$2b$' ou '$2a$'
+      if (!aluno.senhaHash.startsWith('$2')) {
+        // Faz o hash da senha antiga que está em texto puro
+        const novaSenhaHash = await bcrypt.hash(aluno.senhaHash, 10);
+
+        // Atualiza o aluno com a nova senha criptografada
+        await this.prisma.aluno.update({
+          where: { id: aluno.id },
+          data: { senhaHash: novaSenhaHash },
+        });
+
+        console.log(`Senha do aluno ${aluno.email} atualizada para hash.`);
+      }
+    }
+
+    return { message: 'Atualização de senhas concluída' };
   }
 
   // Listar todos os alunos com detalhes
@@ -79,7 +109,7 @@ export class AlunoService {
   // Buscar um aluno pelo ID, incluindo detalhes de curso, universidade, endereço e turmas
   async findOne(id: number) {
     const aluno = await this.prisma.aluno.findUnique({
-      where: { id }, // Passando corretamente o valor de id
+      where: { id },
       include: {
         curso: {
           include: {
@@ -90,6 +120,11 @@ export class AlunoService {
         turmas: {
           include: {
             turma: true,
+          },
+        },
+        permissoes: {
+          include: {
+            permissao: true,
           },
         },
       },
@@ -108,7 +143,7 @@ export class AlunoService {
       include: {
         turmas: {
           include: {
-            turma: true,  // Inclui as turmas relacionadas ao aluno
+            turma: true,
           },
         },
       },
@@ -123,6 +158,7 @@ export class AlunoService {
 
     let senhaHash;
     if (senha) {
+      // Se a senha for atualizada, faz o hash
       senhaHash = await bcrypt.hash(senha, 10);
     }
 

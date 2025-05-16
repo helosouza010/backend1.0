@@ -22,7 +22,16 @@ export class AuthService {
     const { email, senha } = authDto;
 
     // Busca o aluno no banco de dados
-    const aluno = await this.prisma.aluno.findUnique({ where: { email } });
+    const aluno = await this.prisma.aluno.findUnique({
+      where: { email },
+      include: {
+        permissoes: {
+          include: {
+            permissao: true,
+          },
+        },
+      },
+    });
 
     if (!aluno) {
       throw new UnauthorizedException('Credenciais inválidas');  // Se o aluno não existir
@@ -34,18 +43,24 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais inválidas');  // Se as senhas não coincidirem
     }
 
-    const payload = { email, sub: aluno.id };  // Payload do JWT com o ID do aluno
+    const permissoes = aluno.permissoes.map(p => p.permissao.nome);  // Extrai os nomes das permissões
+
+    const payload = {
+      email,
+      sub: aluno.id,
+      permissoes, // ⬅ Aqui vão as permissões no token
+    };
 
     // Gera o access token
     const accessToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: '15m',  // Expira em 15 minutos
+      expiresIn: '15m',
     });
 
-    // Gera o refresh token
+    // Gera o refresh token (também inclui as permissões)
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_SECRET,
-      expiresIn: '7d',  // Expira em 7 dias
+      expiresIn: '7d',
     });
 
     // Armazena o refresh token para validação posterior
@@ -70,9 +85,13 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET,
       });
 
-      // Gera um novo access token
+      // Gera um novo access token com as permissões do payload do refresh token
       const accessToken = this.jwtService.sign(
-        { email: payload.email, sub: payload.sub },  // Usando o email e ID do aluno no payload
+        {
+          email: payload.email,
+          sub: payload.sub,
+          permissoes: payload.permissoes,  // ⬅ Reutiliza as permissões no novo access token
+        },
         {
           secret: process.env.JWT_SECRET,  // Chave secreta do JWT de acesso
           expiresIn: '15m',  // O novo access token expira em 15 minutos

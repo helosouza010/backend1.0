@@ -1,36 +1,73 @@
-// Um "guard" que protege as rotas que precisam de autenticação. 
-// Ele verifica se o token JWT fornecido é válido antes de permitir o acesso àquela rota.
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
-import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';  // Importa os decorators e classes necessárias do NestJS
-import { AuthGuard } from '@nestjs/passport';  // Importa a classe AuthGuard para usar com a estratégia JWT
+@Injectable() // Marca essa classe como um provider injetável no NestJS
+export class JwtAuthGuard extends AuthGuard('jwt') { // Extende o AuthGuard usando a estratégia JWT
 
-@Injectable()  // Torna o guard utilizável como um provedor no NestJS
-export class JwtAuthGuard extends AuthGuard('jwt') {  // Extende o AuthGuard com a estratégia 'jwt'
-
-  // Método canActivate decide se a rota pode ser acessada (se o guard permite o acesso)
+  // Método que decide se a requisição pode prosseguir ou não (autenticação)
   canActivate(context: ExecutionContext) {
-    return super.canActivate(context);  // A decisão de ativar o guard é delegada à estratégia JWT, garantindo que o token é verificado
+    // Usa a implementação padrão do AuthGuard para validação do JWT
+    return super.canActivate(context);
   }
 
-  // Método handleRequest manipula a resposta do guard e lida com erros de autenticação
+  // Método que manipula o resultado da validação (usuário, erros, informações adicionais)
   handleRequest(err, user, info) {
-    const timestamp = new Date().toISOString(); // Obter o timestamp no formato ISO
+    // Cria um timestamp atual para identificar quando a requisição foi processada
+    const timestamp = new Date().toISOString();
 
-    // Status do processo (erro ou sucesso)
+    // Define o status da autenticação: "Erro encontrado" se houve erro ou usuário inválido, "Sem erros" caso contrário
     const status = err || !user ? 'Erro encontrado' : 'Sem erros';
 
-    // Exibir o timestamp apenas uma vez
+    // Exibe o timestamp para organização dos logs
     console.log(`[${timestamp}]`);
-
-    // Exibir os logs subsequentes
+    // Exibe o status da autenticação
     console.log(`Status: ${status}`);
-    console.log(`Usuário autenticado: ${user ? JSON.stringify(user) : 'Nenhum usuário encontrado'}`);
-    console.log(`Info: ${info ? info.message || JSON.stringify(info) : 'Nenhuma informação adicional'}`);
-    console.log(); // Linha em branco para separar os logs
 
-    if (err || !user) {
-      throw new UnauthorizedException('Acesso não autorizado. Verifique o token.');  // Lança uma exceção de "não autorizado" (401)
+    // Exibe o usuário autenticado (com as permissões embutidas no objeto)
+    console.log('Usuário autenticado:');
+    if (user) {
+      // Converte o objeto user para JSON formatado (indentado) para facilitar a leitura no console
+      console.log(JSON.stringify(user, null, 2));
+    } else {
+      // Caso não exista usuário, exibe essa mensagem
+      console.log('Nenhum usuário encontrado');
     }
-    return user;  // Retorna o usuário autenticado para que a requisição prossiga
+
+    // Exibe informações adicionais do processo de autenticação, caso existam
+    console.log(`Info: ${info ? info.message || JSON.stringify(info) : 'Nenhuma informação adicional'}`);
+    console.log(); // Linha em branco para separar visualmente os logs
+
+    // Se houve erro ou usuário inválido, lança exceção de acesso não autorizado (401)
+    if (err || !user) {
+      throw new UnauthorizedException('Acesso não autorizado. Verifique o token.');
+    }
+
+    // Retorna o usuário autenticado para que o NestJS prossiga com a requisição
+    return user;
   }
 }
+
+//CODIGO COMPLETO SEM LOGS
+
+//import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+//import { AuthGuard } from '@nestjs/passport';
+//
+//@Injectable()
+//export class JwtAuthGuard extends AuthGuard('jwt') {
+//
+//  // Método que decide se a requisição pode prosseguir (validação JWT)
+//  canActivate(context: ExecutionContext) {
+//    return super.canActivate(context);
+//  }
+//
+//  // Método que manipula o resultado da validação do token JWT
+//  handleRequest(err, user, info) {
+//    // Se ocorreu erro ou usuário inválido, lança exceção de não autorizado
+//    if (err || !user) {
+//      throw new UnauthorizedException('Acesso não autorizado. Verifique o token.');
+//    }
+//
+//    // Retorna o usuário autenticado para a requisição continuar
+//    return user;
+//  }
+//}

@@ -3,6 +3,8 @@ import { AlunoService } from './aluno.service';
 import { CreateAlunoDto } from './dto/create-aluno.dto';
 import { UpdateAlunoDto } from './dto/update-aluno.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Permissoes } from '../auth/permissoes.decorator';
+import { PermissaoGuard } from '../auth/permissao.guard';
 
 @Controller('aluno')
 export class AlunoController {
@@ -33,10 +35,11 @@ export class AlunoController {
 
   // Buscar um aluno pelo ID
   @Get(':id')
-  //@UseGuards(JwtAuthGuard) // 🔒 Acessada com um token JWT válido
+  @UseGuards(JwtAuthGuard, PermissaoGuard)
+  @Permissoes('R_ALN')
   findOne(@Param('id') id: string) {
     return this.alunoService.findOne(+id);
-  }
+}
 
   // Atualizar um aluno
   @Patch(':id')

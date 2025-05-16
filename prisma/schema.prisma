@@ -21,6 +21,7 @@ model Aluno {
   curso        Curso        @relation(fields: [cursoId], references: [id])
   endereco     Endereco?    @relation("EnderecoAluno")
   turmas       AlunoTurma[]
+  permissoes   AlunoPermissao[] // ⬅ RELAÇÃO N:N
 
   criadoEm     DateTime     @default(now()) @db.Timestamp(0)
   atualizadoEm DateTime     @updatedAt @db.Timestamp(0)
@@ -136,4 +137,21 @@ model ProfessorDisciplina {
   @@id([professorId, disciplinaId])
 }
 
+model Permissao {
+  id         Int              @id @default(autoincrement())
+  nome       String           @unique @db.VarChar(50)
+  alunos     AlunoPermissao[]
+
+  criadoEm   DateTime         @default(now()) @db.Timestamp(0)
+  atualizadoEm DateTime       @updatedAt @db.Timestamp(0)
+}
+model AlunoPermissao {
+  alunoId     Int
+  permissaoId Int
+
+  aluno       Aluno     @relation(fields: [alunoId], references: [id])
+  permissao   Permissao @relation(fields: [permissaoId], references: [id])
+
+  @@id([alunoId, permissaoId])
+}
 
