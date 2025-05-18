@@ -57,4 +57,7 @@ Você pode personalizar os atalhos em:
 [Win/Mac] File > Preferences > Keyboard Shortcuts
 Ou com: Ctrl+K, Ctrl+S
 ===========================================
+curl http://localhost:3000/turmas | jq    ja vem com GET de padrao
+curl -X POST http://localhost:3000/turmas | jq    o -X especifica o metodo
+
 
