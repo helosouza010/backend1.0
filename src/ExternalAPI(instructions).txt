@@ -1,0 +1,170 @@
+1. O que é uma API externa?
+
+    É um serviço web que está disponível em algum endereço HTTP (uma URL).
+
+    Você pode fazer requisições HTTP (GET, POST, etc.) para essa URL e receber dados ou respostas.
+
+    Exemplo: ViaCEP tem a rota https://viacep.com.br/ws/<cep>/json/ que retorna dados do endereço para um CEP.
+Exemplo prático:
+
+Você quer o endereço de um CEP usando ViaCEP.
+
+    Rota da API externa: https://viacep.com.br/ws/01001000/json/
+
+    Na sua API, você chama essa rota e recebe o JSON com o endereço.
+
+    Exemplo de código no seu serviço:
+
+const resposta = await firstValueFrom(
+  this.httpService.get(`https://viacep.com.br/ws/${cep}/json/`),
+);
+console.log(resposta.data);
+
+
+E como chamar essa função na sua API?
+
+    Você cria uma rota na sua API (por exemplo, GET /aluno/endereco/:cep)
+
+    Essa rota chama o método do seu serviço que consome a API externa.
+
+    Retorna os dados para quem chamou sua API.
+
+5. Fluxo final
+
+[Cliente (frontend)] ---> [Sua API (NestJS)] ---> [API externa ViaCEP]
+                                        <--- responde
+                    <--- retorna para o cliente
+
+
+
+
+
+
+
+
+
+🧩 Suponha que você quer buscar o endereço de um aluno pelo CEP que ele informou
+Cenário:
+
+    O usuário envia um CEP na hora de cadastrar o aluno
+
+    Você quer consultar o ViaCEP para buscar os dados do endereço
+
+    E salvar no banco ou só usar esses dados
+
+🔧 Onde você vai colocar cada parte do código
+✅ 1. Crie um serviço para consumir a API externa
+
+Arquivo: viacep.service.ts
+
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
+import { firstValueFrom } from 'rxjs';
+
+@Injectable()
+export class ViaCepService {
+  constructor(private readonly httpService: HttpService) {}
+
+  async buscarEnderecoPorCep(cep: string) {
+    const url = `https://viacep.com.br/ws/${cep}/json/`;
+
+    try {
+      const resposta = await firstValueFrom(this.httpService.get(url));
+      return resposta.data;
+    } catch (erro) {
+      throw new Error(`Erro ao buscar CEP: ${erro.message}`);
+    }
+  }
+}
+
+✅ 2. Registre o HttpModule e o ViaCepService no módulo
+
+Arquivo: aluno.module.ts (ou AppModule, dependendo de onde vai usar)
+
+import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import { ViaCepService } from './viacep.service';
+import { AlunoService } from './aluno.service';
+// outros imports...
+
+@Module({
+  imports: [HttpModule],
+  providers: [AlunoService, ViaCepService],
+  exports: [ViaCepService],
+})
+export class AlunoModule {}
+
+
+✅ 3. Injete e use o serviço no AlunoService
+
+Arquivo: aluno.service.ts
+
+@Injectable()
+export class AlunoService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly viaCepService: ViaCepService,
+  ) {}
+
+  async create(createAlunoDto: CreateAlunoDto) {
+    const { nome, email, senha, cursoId, endereco, turmaId } = createAlunoDto;
+
+    // Buscar dados de endereço externo (ex: ViaCEP)
+    const enderecoExterno = await this.viaCepService.buscarEnderecoPorCep(endereco.cep);
+
+    console.log('Endereço retornado pela API externa:', enderecoExterno);
+
+    // Aqui você pode usar os dados para criar o aluno ou só validar
+    // Exemplo: salvar o endereço completo no banco junto com o aluno
+
+    return await this.prisma.aluno.create({
+      data: {
+        nome,
+        email,
+        cursoId,
+        endereco: {
+          create: {
+            cep: enderecoExterno.cep,
+            rua: enderecoExterno.logradouro,
+            bairro: enderecoExterno.bairro,
+            cidade: enderecoExterno.localidade,
+            estado: enderecoExterno.uf,
+            tipo: endereco.tipo, // vindo do DTO
+          },
+        },
+      },
+      include: {
+        endereco: true,
+      },
+    });
+  }
+}
+
+🧪 Teste final
+Requisição:
+
+POST /alunos
+{
+  "nome": "Lucas",
+  "email": "lucas@email.com",
+  "senha": "123456",
+  "cursoId": 1,
+  "endereco": {
+    "cep": "01001000",
+    "tipo": "RESIDENCIAL"
+  }
+}
+
+Resultado:
+
+    Sua API consulta o CEP no ViaCEP
+
+    Monta o endereço completo
+
+    Cria o aluno com esse endereço
+
+✅ Recapitulando
+Onde colocar	O quê colocar
+viacep.service.ts	Lógica para chamar a API externa
+aluno.module.ts	Importa HttpModule e registra o serviço
+aluno.service.ts	Injeta e usa o serviço no método create

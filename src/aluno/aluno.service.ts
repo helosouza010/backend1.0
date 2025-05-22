@@ -8,10 +8,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAlunoDto } from './dto/create-aluno.dto';
 import { UpdateAlunoDto } from './dto/update-aluno.dto';
 import * as bcrypt from 'bcrypt';
+import { EmailService } from '../email/email.service'; //importacao de emails
 
 @Injectable()
 export class AlunoService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly emailService: EmailService, // INJETANDO o serviço de email
+  ) {}
 
   // Criar um novo aluno com endereço e vincular a uma turma (se fornecida)
   async create(createAlunoDto: CreateAlunoDto) {
@@ -24,6 +28,14 @@ export class AlunoService {
     if (emailExistente) {
       throw new BadRequestException('Já existe um aluno com este e-mail');
     }
+
+    //Envia o msgEmail para email valido
+    await this.emailService.enviarEmail(
+      email,
+      'Bem-vindo!',
+      'Olá, seja bem-vindo à nossa plataforma.',
+      '<b>Olá, seja bem-vindo à nossa plataforma.</b>',
+    );
 
     // Verifica se o curso existe
     const curso = await this.prisma.curso.findUnique({
