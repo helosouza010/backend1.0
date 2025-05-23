@@ -12,6 +12,7 @@ import { ProfessorModule } from './professor/professor.module';
 import { TurmaModule } from './turma/turma.module';
 import { DevModule } from './dev/dev.module';
 import { HttpModule } from '@nestjs/axios';//npm install @nestjs/axios
+import { ApisModule } from './APIs/api.module';
 
 
 
@@ -27,7 +28,8 @@ import { HttpModule } from '@nestjs/axios';//npm install @nestjs/axios
     ProfessorModule,
     TurmaModule,
     DevModule,
-    HttpModule
+    HttpModule,
+    ApisModule
     
   ],
   controllers: [AppController],
